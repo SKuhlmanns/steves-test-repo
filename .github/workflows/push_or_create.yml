@@ -23,8 +23,8 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup build environment for release branches
-        #if ${{ github.ref == 'refs/heads/release_v*' }}
-        if contains(github.ref,'refs/heads/release_v')
+        #if: ${{ github.ref == 'refs/heads/release_v*' }}
+        if: contains(github.ref,'refs/heads/release_v')
         run: |
           echo "PHASE ID: ${PHASE_ID}"
           echo "BUILD NUMBER: ${BUILD_NUMBER}"
@@ -32,8 +32,8 @@ jobs:
           echo "PHASE_ID=b" >> $GITHUB_ENV
 
       - name: Setup build environment for release tags
-        #if ${{ github.ref == 'refs/tags/LIB*' }}
-        if contains(github.ref,'refs/tags/LIB')
+        #if: ${{ github.ref == 'refs/tags/LIB*' }}
+        if: contains(github.ref,'refs/tags/LIB')
         run: |
           echo "PHASE ID: ${PHASE_ID}"
           echo "BUILD NUMBER: ${BUILD_NUMBER}"
