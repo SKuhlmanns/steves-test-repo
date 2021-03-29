@@ -3,10 +3,12 @@ name: Build on push or create for develop and release branches
 on: 
   push:
     branches:
+	  # Push events on develop branch
+      - develop
+	  # Push events on release branches
       - 'release_v*'
-      - 'develop'
     tags:
-      - LIB_*
+      - LIB_* # Push events matching refs/heads/LIB_* tags
 
 on: create
 
