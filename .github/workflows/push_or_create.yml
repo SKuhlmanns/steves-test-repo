@@ -10,7 +10,7 @@ on:
     tags:
       - LIB_*    # Push events matching refs/heads/LIB_* tags
 
-#on: create
+  create:
 
 jobs:
 
