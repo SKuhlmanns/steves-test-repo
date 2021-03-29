@@ -26,12 +26,18 @@ jobs:
         #if ${{ github.ref == 'refs/heads/release_v*' }}
         if contains(github.ref,'refs/heads/release_v')
         run: |
+          echo "PHASE ID: ${PHASE_ID}"
+          echo "BUILD NUMBER: ${BUILD_NUMBER}"
+          echo "Setting PHASE ID to b"
           echo "PHASE_ID=b" >> $GITHUB_ENV
 
       - name: Setup build environment for release tags
-        #if ${{ github.ref == 'refs/tags/NOVOS_LIB*' }}
-        if contains(github.ref,'refs/tags/NOVOS_LIB')
+        #if ${{ github.ref == 'refs/tags/LIB*' }}
+        if contains(github.ref,'refs/tags/LIB')
         run: |
+          echo "PHASE ID: ${PHASE_ID}"
+          echo "BUILD NUMBER: ${BUILD_NUMBER}"
+          echo "Setting PHASE ID to blank"
           echo "PHASE_ID=" >> $GITHUB_ENV
 
       - name: Build the application
@@ -40,6 +46,7 @@ jobs:
           export VER_NUM=`cat version.txt` 
           echo "${VER_NUM}${{ env.PHASE_ID }}" > version_num.txt
           PHASE_ID=${{ env.PHASE_ID }}
+          echo "PHASE ID: ${PHASE_ID}"
           bash bbuild.sh .. 
 
       - name: Upload version.txt artifact
