@@ -6,7 +6,7 @@ on:
       # Push events on develop branch
       - develop
       # Push events on release branches
-#      - 'release_v*'
+      - 'release_v*'
 #    tags:
 #      - LIB_*    # Push events matching refs/heads/LIB_* tags
 
