@@ -1,0 +1,40 @@
+name: Build on pull request
+
+on: pull_request
+
+jobs:
+
+  build-linux:
+    runs-on: ubuntu-latest
+    env:
+      BUILD_NUMBER: ${{ github.run_number }}
+      PHASE_ID: x
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build the application
+        working-directory: build
+        run: |
+          export VER_NUM=`cat version.txt`
+          echo ${VER_NUM}${PHASE_ID} > version_num.txt
+          echo "PHASE_ID: ${PHASE_ID}"
+          cat version_num.txt
+          bash bbuild.sh ..
+
+      - name: Upload version.txt artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: version-txt
+          path: |
+            build/version.txt
+
+      - name: Upload version_num.txt artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: version-num-txt
+          path: |
+            build/version_num.txt
