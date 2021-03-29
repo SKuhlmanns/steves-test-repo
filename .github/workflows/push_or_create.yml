@@ -1,0 +1,59 @@
+name: Build on push or create for develop and release branches
+
+on: 
+  push:
+    branches:
+      - 'release_v*'
+      - 'develop'
+    tags:
+      - LIB_*
+
+on: create
+
+jobs:
+
+  build-linux:
+    runs-on: ubuntu-latest
+    env:
+      BUILD_NUMBER: ${{ github.run_number }}
+      PHASE_ID: x
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup build environment for release branches
+        #if ${{ github.ref == 'refs/heads/release_v*' }}
+        if contains(github.ref,'refs/heads/release_v')
+        run: |
+          echo "PHASE_ID=b" >> $GITHUB_ENV
+
+      - name: Setup build environment for release tags
+        #if ${{ github.ref == 'refs/tags/NOVOS_LIB*' }}
+        if contains(github.ref,'refs/tags/NOVOS_LIB')
+        run: |
+          echo "PHASE_ID=" >> $GITHUB_ENV
+
+      - name: Build the application
+        working-directory: build
+        run: |
+          export VER_NUM=`cat version.txt` 
+          echo "${VER_NUM}${{ env.PHASE_ID }}" > version_num.txt
+          PHASE_ID=${{ env.PHASE_ID }}
+          bash bbuild.sh .. 
+
+      - name: Upload version.txt artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: version-txt
+          path: |
+            build/version.txt
+
+      - name: Upload version_num.txt artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: version-num-txt
+          path: |
+            build/version_num.txt
