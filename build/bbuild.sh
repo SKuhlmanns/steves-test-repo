@@ -41,11 +41,11 @@ then
     if [[ $UNAME == *Linux* ]]; then
         echo "Linux Non-Interactive Example:"
         echo
-        echo "docker run --mount type=bind,source="$(pwd)/../..",target=/srv/workspace --workdir /srv/workspace/libraries/build -it stash.nov.com:5006/deb9/build/novos-build-linux:latest bash ./`basename $0` .. BUILDER=1 FALSE BUILD=Release"
+        echo "docker run --rm --mount type=bind,source="$(pwd)/../..",target=/srv/workspace --workdir /srv/workspace/libraries/build -it stash.nov.com:5006/deb9/build/novos-build-linux:latest bash ./`basename $0` .. BUILDER=1 FALSE BUILD=Release"
         echo 
         echo "Linux Interactive Example:"
         echo
-        echo "docker run --mount type=bind,source="$(pwd)/../..",target=/srv/workspace --workdir /srv/workspace/libraries/build -it stash.nov.com:5006/deb9/build/novos-build-linux:latest bash"
+        echo "docker run --rm --mount type=bind,source="$(pwd)/../..",target=/srv/workspace --workdir /srv/workspace/libraries/build -it stash.nov.com:5006/deb9/build/novos-build-linux:latest bash"
         echo 
     else
         dirname `pwd` | sed 's./.\\.g' | cut -c 2- | sed "s/^c/c:/g" > workdir.txt
@@ -53,11 +53,11 @@ then
         rm workdir.txt
         echo "Windows Non-Interactive (Command or Powershell) Example:"
         echo
-        echo 'docker run --mount type=bind,source='$WORKPATH',target=c:\code --workdir c:\code\build -it stash.nov.com:5006/win/build/novos-build-win:latest powershell c:\Git\bin\bash.exe' ./`basename $0` '.. BUILDER=1 FALSE BUILD=Release'
+        echo 'docker run --rm --mount type=bind,source='$WORKPATH',target=c:\code --workdir c:\code\build -it stash.nov.com:5006/win/build/novos-build-win:latest powershell c:\Git\bin\bash.exe' ./`basename $0` '.. BUILDER=1 FALSE BUILD=Release'
         echo
         echo "Windows Interactive (Command or Powershell) Example:"
         echo
-        echo 'docker run --mount type=bind,source='$WORKPATH',target=c:\code --workdir c:\code\build -it stash.nov.com:5006/win/build/novos-build-win:latest powershell c:\Git\bin\bash.exe'
+        echo 'docker run --rm --mount type=bind,source='$WORKPATH',target=c:\code --workdir c:\code\build -it stash.nov.com:5006/win/build/novos-build-win:latest powershell c:\Git\bin\bash.exe'
         echo
     fi
     exit $E_BADARGS
