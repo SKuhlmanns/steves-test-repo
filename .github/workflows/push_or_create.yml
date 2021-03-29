@@ -6,11 +6,11 @@ on:
       # Push events on develop branch
       - develop
       # Push events on release branches
-      - 'release_v*'
-    tags:
-      - LIB_*    # Push events matching refs/heads/LIB_* tags
+#      - 'release_v*'
+#    tags:
+#      - LIB_*    # Push events matching refs/heads/LIB_* tags
 
-on: create
+#on: create
 
 jobs:
 
