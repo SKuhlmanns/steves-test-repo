@@ -1,4 +1,4 @@
-name: Build on push or create for develop and release branches
+name: Build on push to develop and release branches
 
 on: 
   push:
@@ -9,8 +9,6 @@ on:
       - 'release_v*'
     tags:
       - LIB_*    # Push events matching refs/heads/LIB_* tags
-
-  create:
 
 jobs:
 
