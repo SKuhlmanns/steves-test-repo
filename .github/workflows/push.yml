@@ -44,7 +44,7 @@ jobs:
         working-directory: build
         run: |
           export VER_NUM=`cat version.txt` 
-          echo "${VER_NUM}${{ env.PHASE_ID }}" > version_num.txt
+          echo "${VER_NUM}${{ env.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
           PHASE_ID=${{ env.PHASE_ID }}
           echo "PHASE ID: ${PHASE_ID}"
           bash bbuild.sh .. 
