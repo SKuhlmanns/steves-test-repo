@@ -18,7 +18,7 @@ jobs:
         working-directory: build
         run: |
           export VER_NUM=`cat version.txt`
-          echo ${VER_NUM}${PHASE_ID} > version_num.txt
+          echo ${VER_NUM}${PHASE_ID}-${BUILD_NUMBER} > version_num.txt
           echo "PHASE ID: ${PHASE_ID}"
           echo "BUILD NUMBER: ${BUILD_NUMBER}"
           cat version_num.txt
