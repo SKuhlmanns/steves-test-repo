@@ -29,7 +29,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-txt
+          name: version-${{ github.base_ref }}-txt
           path: |
             build/version.txt
 
@@ -37,7 +37,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-num-txt
+          name: version-num-${{ github.base_ref }}-txt
           path: |
             build/version_num.txt
 
