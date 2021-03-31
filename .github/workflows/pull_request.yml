@@ -11,6 +11,36 @@ jobs:
       PHASE_ID: x
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build the application
+        working-directory: build
+        run: |
+          export VER_NUM=`cat version.txt`
+          echo ${VER_NUM}${PHASE_ID}-${BUILD_NUMBER} > version_num.txt
+          echo "PHASE ID: ${PHASE_ID}"
+          echo "BUILD NUMBER: ${BUILD_NUMBER}"
+          cat version_num.txt
+          echo ${{github.repository}}
+          bash bbuild.sh ..
+
+      - name: Upload version.txt artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: version-txt
+          path: |
+            build/version.txt
+
+      - name: Upload version_num.txt artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: version-num-txt
+          path: |
+            build/version_num.txt
+
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
@@ -41,32 +71,3 @@ jobs:
           MATRIX_CONTEXT: ${{ toJSON(matrix) }}
         run: echo "$MATRIX_CONTEXT"
 
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Build the application
-        working-directory: build
-        run: |
-          export VER_NUM=`cat version.txt`
-          echo ${VER_NUM}${PHASE_ID}-${BUILD_NUMBER} > version_num.txt
-          echo "PHASE ID: ${PHASE_ID}"
-          echo "BUILD NUMBER: ${BUILD_NUMBER}"
-          cat version_num.txt
-          echo ${{github.repository}}
-          bash bbuild.sh ..
-
-      - name: Upload version.txt artifact
-        if: ${{ success() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: version-txt
-          path: |
-            build/version.txt
-
-      - name: Upload version_num.txt artifact
-        if: ${{ success() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: version-num-txt
-          path: |
-            build/version_num.txt
