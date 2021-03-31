@@ -54,7 +54,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-txt
+          name: version-${{ github.base_ref }}-txt
           path: |
             build/version.txt
 
@@ -62,6 +62,35 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-num-txt
+          name: version-num$-{{ github.base_ref }}-txt
           path: |
             build/version_num.txt
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - name: Dump job context
+        env:
+          JOB_CONTEXT: ${{ toJSON(job) }}
+        run: echo "$JOB_CONTEXT"
+
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJSON(steps) }}
+        run: echo "$STEPS_CONTEXT"
+
+      - name: Dump runner context
+        env:
+          RUNNER_CONTEXT: ${{ toJSON(runner) }}
+        run: echo "$RUNNER_CONTEXT"
+
+      - name: Dump strategy context
+        env:
+          STRATEGY_CONTEXT: ${{ toJSON(strategy) }}
+        run: echo "$STRATEGY_CONTEXT"
+
+      - name: Dump matrix context
+        env:
+          MATRIX_CONTEXT: ${{ toJSON(matrix) }}
+        run: echo "$MATRIX_CONTEXT"
