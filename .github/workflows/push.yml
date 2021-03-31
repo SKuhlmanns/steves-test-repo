@@ -43,6 +43,10 @@ jobs:
       - name: Build the application
         working-directory: build
         run: |
+          echo "Repo Owner:" ${{ github.repository_owner }}
+          echo "Run ID:" ${{ github.run_id }}
+          echo "Default branch:" ${{ github.event.repository.default_branch }}
+
           export VER_NUM=`cat version.txt` 
           echo "${VER_NUM}${{ env.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
           PHASE_ID=${{ env.PHASE_ID }}
@@ -54,7 +58,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-${{ github.default_branch }}-txt
+          name: version-${{ github.event.repository.default_branch }}-txt
           path: |
             build/version.txt
 
@@ -62,7 +66,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-num-${{ github.default_branch }}-txt
+          name: version-num-${{ github.event.repository.default_branch }}-txt
           path: |
             build/version_num.txt
       - name: Dump GitHub context
