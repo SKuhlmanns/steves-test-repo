@@ -54,7 +54,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-${{ github.base_ref }}-txt
+          name: version-${{ github.default_branch }}-txt
           path: |
             build/version.txt
 
@@ -62,7 +62,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-num$-{{ github.base_ref }}-txt
+          name: version-num-${{ github.default_branch }}-txt
           path: |
             build/version_num.txt
       - name: Dump GitHub context
