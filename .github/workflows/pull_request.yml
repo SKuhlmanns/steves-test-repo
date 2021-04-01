@@ -29,7 +29,8 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-${{ github.head_ref }}-txt
+          #name: version-${{ github.head_ref }}-txt
+          name: version-txt
           path: |
             build/version.txt
 
@@ -37,7 +38,8 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-num-${{ github.head_ref }}-txt
+          #name: version-num-${{ github.head_ref }}-txt
+          name: version-num-txt
           path: |
             build/version_num.txt
 
