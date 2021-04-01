@@ -22,6 +22,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Get branch or tag name from git reference
+        run: |
+          BRANCH_OR_TAG=`basename ${{ github.ref }}`
+          echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
+
       - name: Setup build environment for release branches
         if: contains(github.ref,'refs/heads/release_v')
         run: |
@@ -29,8 +34,6 @@ jobs:
           echo "BUILD NUMBER: ${BUILD_NUMBER}"
           echo "Setting PHASE ID to b"
           echo "PHASE_ID=b" >> $GITHUB_ENV
-          BRANCH_OR_TAG=`basename ${{ github.ref }}`
-          echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
 
       - name: Setup build environment for release tags
         if: contains(github.ref,'refs/tags/LIB')
@@ -39,8 +42,6 @@ jobs:
           echo "BUILD NUMBER: ${BUILD_NUMBER}"
           echo "Setting PHASE ID to blank"
           echo "PHASE_ID=" >> $GITHUB_ENV
-          BRANCH_OR_TAG=`basename ${{ github.ref }}`
-          echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
 
       - name: Build the application
         working-directory: build
