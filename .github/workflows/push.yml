@@ -108,7 +108,10 @@ jobs:
           curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/dispatches \
           -H 'Accept: application/vnd.github.v3+json' \
           -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
-          --data '{"event_type": "downstream-trigger", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'", "LIB_BRANCH_OR_TAG": "'"${{ env.BRANCH_OR_TAG }}"'" }}'
+          --data '{"event_type": "downstream-trigger", \
+                 "client_payload": { \
+                   "repository": "'"$GITHUB_REPOSITORY"'", \
+                   "LIB_BRANCH_OR_TAG": "'"${{ env.BRANCH_OR_TAG }}"'" }}'
 
 #      - name: ACK - Acknowledge pong from remote repository
 #        if: github.event.action == 'pong'
