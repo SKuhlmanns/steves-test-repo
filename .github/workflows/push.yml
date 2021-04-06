@@ -1,4 +1,4 @@
-name: Build on push to develop and release branches
+name: Build develop and release branches
 
 on: 
   push:
