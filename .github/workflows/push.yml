@@ -108,7 +108,7 @@ jobs:
           curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/dispatches \
           -H 'Accept: application/vnd.github.v3+json' \
           -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
-          -d '{"event_type": "downstream-trigger", 
+          -d '{"event_type": "trigger", 
                 "client_payload": { 
                   "repository": "'"$GITHUB_REPOSITORY"'", 
                   "LIB_BRANCH_OR_TAG": "'"${{ env.BRANCH_OR_TAG }}"'" 
