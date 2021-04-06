@@ -2,14 +2,14 @@ name: Build develop and release branches
 
 on: 
   push:
-#    repository_dispatch:
     branches:
       # Push events on develop branch
       - develop
       # Push events on release branches
       - 'release_v*'
-#    tags:
-#      - LIB_*    # Push events matching refs/heads/LIB_* tags
+    tags:
+      - LIB_*    # Push events matching refs/heads/LIB_* tags
+  repository_dispatch:
 
 jobs:
 
@@ -102,13 +102,13 @@ jobs:
           MATRIX_CONTEXT: ${{ toJSON(matrix) }}
         run: echo "$MATRIX_CONTEXT"
 
-#      - name: PING - Dispatch initiating repository event
-#        if: github.event.action != 'pong'
-#        run: |
-#          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/dispatches \
-#          -H 'Accept: application/vnd.github.v3+json' \
-#          -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
-#          --data '{"event_type": "ping", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
+      - name: PING - Dispatch initiating repository event
+        if: github.event.action != 'pong'
+        run: |
+          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/dispatches \
+          -H 'Accept: application/vnd.github.v3+json' \
+          -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
+          --data '{"event_type": "ping", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
 
 #      - name: ACK - Acknowledge pong from remote repository
 #        if: github.event.action == 'pong'
