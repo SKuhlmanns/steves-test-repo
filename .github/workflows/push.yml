@@ -112,7 +112,7 @@ jobs:
                   "client_payload": \
                     { \
                     "repository": "'"$GITHUB_REPOSITORY"'", \
-                    "LIB_BRANCH_OR_TAG": "${{ env.BRANCH_OR_TAG }}" \
+                    "LIB_BRANCH_OR_TAG": "'"${{ env.BRANCH_OR_TAG }}"'" \
                     } \
                   }'
 
