@@ -109,7 +109,7 @@ jobs:
           -H 'Accept: application/vnd.github.v3+json' \
           -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
           --data '{"event_type": "downstream-trigger", \
-                  "client_payload": 
+                  "client_payload": \
                     { \
                     "repository": "'"$GITHUB_REPOSITORY"'", \
                     "LIB_BRANCH_OR_TAG": "${{ env.BRANCH_OR_TAG }}", \
