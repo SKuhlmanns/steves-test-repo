@@ -102,7 +102,7 @@ jobs:
           MATRIX_CONTEXT: ${{ toJSON(matrix) }}
         run: echo "$MATRIX_CONTEXT"
 
-      - name: Trigger: steves-test-repo2 repository event
+      - name: Trigger - steves-test-repo2 event
 #        if: github.event.action != 'pong'
         run: |
           curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/dispatches \
