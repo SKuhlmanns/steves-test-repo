@@ -31,7 +31,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          ref: ${{ env.BRANCH }}
+          ref: ${{ github.event.inputs.BRANCH }}
 
 #      - name: Get branch or tag name from git reference
 #        run: |
@@ -61,9 +61,9 @@ jobs:
           echo "Run ID:" ${{ github.run_id }}
 
           export VER_NUM=`cat version.txt` 
-          echo "${VER_NUM}${{ env.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
-          PHASE_ID=${{ env.PHASE_ID }}
-          echo "PHASE ID: ${PHASE_ID}"
+          echo "${VER_NUM}${{ github.event.inputs.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
+          PHASE_ID=${{ github.event.inputs.PHASE_ID }}
+          echo "PHASE ID: ${{ github.event.inputs.PHASE_ID }}"
           cat version_num.txt
           bash bbuild.sh .. 
 
@@ -79,7 +79,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-num-${{ env.BRANCH_OR_TAG }}-txt
+          name: version-num-${{ github.event.inputs.BRANCH }}-txt
           path: |
             build/version_num.txt
       - name: Dump GitHub context
