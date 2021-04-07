@@ -15,10 +15,10 @@ on:
         description: 'Git Tag Name'
         required: false
         default: 'NOVOS_LIB_4.3.0'
-      BRANCH:
-        description: 'Git Branch Name'
-        required: true
-        default: 'release_v4.3'
+#      BRANCH:
+#        description: 'Git Branch Name'
+#        required: true
+#        default: 'release_v4.3'
 
 jobs:
 
@@ -30,13 +30,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.inputs.BRANCH }}
 
-#      - name: Get branch or tag name from git reference
-#        run: |
-#          BRANCH_OR_TAG=`basename ${{ github.ref }}`
-#          echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
+      - name: Get branch or tag name from git reference
+        run: |
+          BRANCH_OR_TAG=`basename ${{ github.ref }}`
+          echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
 
 #      - name: Setup build environment for release branches
 #        if: contains(github.ref,'refs/heads/release_v')
@@ -79,7 +77,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-num-${{ github.event.inputs.BRANCH }}-txt
+          name: version-num-${{ env.BRANCH_OR_TAG }}-txt
           path: |
             build/version_num.txt
       - name: Dump GitHub context
