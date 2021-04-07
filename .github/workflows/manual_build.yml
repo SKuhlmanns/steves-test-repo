@@ -5,8 +5,8 @@ on:
     inputs:
       PHASE_ID:
         description: 'Phase Identifier (x, f, b or null)'
-        required: true
-        default: ""
+        required: false
+        default: ''
       TAG:
         description: 'Tag (N/Y)'
         required: true
