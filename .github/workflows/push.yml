@@ -111,6 +111,7 @@ jobs:
           -d '{"event_type": "trigger", 
                 "client_payload": { 
                   "repository": "'"$GITHUB_REPOSITORY"'", 
+                  "ref": "${{ github.ref }}", 
                   "LIB_BRANCH_OR_TAG": "'"${{ env.BRANCH_OR_TAG }}"'" 
                 }
               }'
