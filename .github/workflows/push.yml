@@ -23,6 +23,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Set selected color
+        run: echo '::set-output name=SELECTED_COLOR::green'
+        id: random-color-generator
+
+      - name: Get color
+        run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
+
       - name: Get branch or tag name from git reference
         run: |
           BRANCH_OR_TAG=`basename ${{ github.ref }}`
