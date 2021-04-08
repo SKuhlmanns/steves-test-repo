@@ -79,7 +79,7 @@ jobs:
             build/version_num.txt
  
       - name: Dump context
-        if ${{ env.DISPLAY_CONTEXT == 'true' }}
+        if: ${{ env.DISPLAY_CONTEXT == 'true' }}
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
           JOB_CONTEXT: ${{ toJSON(job) }}
