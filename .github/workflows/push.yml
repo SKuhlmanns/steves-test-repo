@@ -13,12 +13,11 @@ on:
 
 jobs:
 
-  build-linux:
+  linux-setup:
     runs-on: ubuntu-latest
     env:
       BUILD_NUMBER: ${{ github.run_number }}
       PHASE_ID: x
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -51,6 +50,10 @@ jobs:
           echo "Setting PHASE ID to blank"
           echo "PHASE_ID=" >> $GITHUB_ENV
 
+  linux-build:
+    needs: linux-setup
+    runs-on: ubuntu-latest
+    steps:
       - name: Build the application
         working-directory: build
         run: |
@@ -79,6 +82,38 @@ jobs:
           name: version-num-${{ env.BRANCH_OR_TAG }}-txt
           path: |
             build/version_num.txt
+
+  linux-trigger:
+    needs: linux-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger - steves-test-repo2 event
+#        if: github.event.action != 'pong'
+        run: |
+          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/dispatches \
+          -H 'Accept: application/vnd.github.v3+json' \
+          -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
+          -d '{"event_type": "trigger", 
+                "client_payload": { 
+                  "repository": "'"$GITHUB_REPOSITORY"'", 
+                  "ref": "${{ github.ref }}", 
+                  "LIB_BRANCH_OR_TAG": "'"${{ env.BRANCH_OR_TAG }}"'" 
+                }
+              }'
+
+#      - name: ACK - Acknowledge pong from remote repository
+#        if: github.event.action == 'pong'
+#        run: |
+#          echo "PONG received from '${{ github.event.client_payload.repository }}'" && \
+#          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/dispatches \
+#          -H 'Accept: application/vnd.github.v3+json' \
+#          -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
+#          --data '{"event_type": "ack", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
+
+  linux-context:
+    needs: linux-trigger
+    runs-on: ubuntu-latest
+    steps:
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
@@ -108,26 +143,3 @@ jobs:
         env:
           MATRIX_CONTEXT: ${{ toJSON(matrix) }}
         run: echo "$MATRIX_CONTEXT"
-
-      - name: Trigger - steves-test-repo2 event
-#        if: github.event.action != 'pong'
-        run: |
-          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/dispatches \
-          -H 'Accept: application/vnd.github.v3+json' \
-          -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
-          -d '{"event_type": "trigger", 
-                "client_payload": { 
-                  "repository": "'"$GITHUB_REPOSITORY"'", 
-                  "ref": "${{ github.ref }}", 
-                  "LIB_BRANCH_OR_TAG": "'"${{ env.BRANCH_OR_TAG }}"'" 
-                }
-              }'
-
-#      - name: ACK - Acknowledge pong from remote repository
-#        if: github.event.action == 'pong'
-#        run: |
-#          echo "PONG received from '${{ github.event.client_payload.repository }}'" && \
-#          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/dispatches \
-#          -H 'Accept: application/vnd.github.v3+json' \
-#          -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
-#          --data '{"event_type": "ack", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
