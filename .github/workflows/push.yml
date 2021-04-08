@@ -10,6 +10,8 @@ on:
     tags:
       - LIB_*    # Push events matching refs/heads/LIB_* tags
   repository_dispatch:
+env:
+  DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }}
 
 jobs:
 
@@ -23,13 +25,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Set selected color
-        run: echo '::set-output name=SELECTED_COLOR::green'
-        id: random-color-generator
-
-      - name: Get color
-        run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
 
       - name: Get branch or tag name from git reference
         id: branchname
@@ -82,6 +77,25 @@ jobs:
           name: version-num-${{ env.BRANCH_OR_TAG }}-txt
           path: |
             build/version_num.txt
+ 
+      - name: Dump context
+        if ${{ env.DISPLAY_CONTEXT == 'true' }}
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+          JOB_CONTEXT: ${{ toJSON(job) }}
+          STEPS_CONTEXT: ${{ toJSON(steps) }}
+        run: |
+          echo "GITHUB CONTEXT:"
+          echo
+          echo "$GITHUB_CONTEXT"
+          echo
+          echo "JOB CONTEXT:"
+          echo
+          echo "$JOB_CONTEXT"
+          echo
+          echo "STEPS CONTEXT:"
+          echo
+          echo "$STEPS_CONTEXT"
 
   linux-trigger:
     needs: linux-build
