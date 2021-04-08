@@ -113,6 +113,25 @@ jobs:
                 }
               }'
 
+      - name: Dump context
+        if: ${{ env.DISPLAY_CONTEXT == 'true' }}
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+          JOB_CONTEXT: ${{ toJSON(job) }}
+          STEPS_CONTEXT: ${{ toJSON(steps) }}
+        run: |
+          echo "GITHUB CONTEXT:"
+          echo
+          echo "$GITHUB_CONTEXT"
+          echo
+          echo "JOB CONTEXT:"
+          echo
+          echo "$JOB_CONTEXT"
+          echo
+          echo "STEPS CONTEXT:"
+          echo
+          echo "$STEPS_CONTEXT"
+
 #      - name: ACK - Acknowledge pong from remote repository
 #        if: github.event.action == 'pong'
 #        run: |
@@ -122,36 +141,36 @@ jobs:
 #          -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
 #          --data '{"event_type": "ack", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
 
-  linux-context:
-    needs: linux-trigger
-    runs-on: ubuntu-latest
-    steps:
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJSON(github) }}
-        run: echo "$GITHUB_CONTEXT"
-
-      - name: Dump job context
-        env:
-          JOB_CONTEXT: ${{ toJSON(job) }}
-        run: echo "$JOB_CONTEXT"
-
-      - name: Dump steps context
-        env:
-          STEPS_CONTEXT: ${{ toJSON(steps) }}
-        run: echo "$STEPS_CONTEXT"
-
-      - name: Dump runner context
-        env:
-          RUNNER_CONTEXT: ${{ toJSON(runner) }}
-        run: echo "$RUNNER_CONTEXT"
-
-      - name: Dump strategy context
-        env:
-          STRATEGY_CONTEXT: ${{ toJSON(strategy) }}
-        run: echo "$STRATEGY_CONTEXT"
-
-      - name: Dump matrix context
-        env:
-          MATRIX_CONTEXT: ${{ toJSON(matrix) }}
-        run: echo "$MATRIX_CONTEXT"
+#  linux-context:
+#    needs: linux-trigger
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Dump GitHub context
+#        env:
+#          GITHUB_CONTEXT: ${{ toJSON(github) }}
+#        run: echo "$GITHUB_CONTEXT"
+#
+#      - name: Dump job context
+#        env:
+#          JOB_CONTEXT: ${{ toJSON(job) }}
+#        run: echo "$JOB_CONTEXT"
+#
+#      - name: Dump steps context
+#        env:
+#          STEPS_CONTEXT: ${{ toJSON(steps) }}
+#        run: echo "$STEPS_CONTEXT"
+#
+#      - name: Dump runner context
+#        env:
+#          RUNNER_CONTEXT: ${{ toJSON(runner) }}
+#        run: echo "$RUNNER_CONTEXT"
+#
+#      - name: Dump strategy context
+#        env:
+#          STRATEGY_CONTEXT: ${{ toJSON(strategy) }}
+#        run: echo "$STRATEGY_CONTEXT"
+#
+#      - name: Dump matrix context
+#        env:
+#          MATRIX_CONTEXT: ${{ toJSON(matrix) }}
+#        run: echo "$MATRIX_CONTEXT"
