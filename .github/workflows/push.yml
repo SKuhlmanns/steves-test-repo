@@ -37,12 +37,20 @@ jobs:
           echo "::set-output name=branch_or_tag::${BRANCH_OR_TAG}"
 
       - name: Setup build environment for release branches
-        if: contains(github.ref,'refs/heads/release_v')
+        if: contains(github.ref,'refs/heads/release')
         run: |
           echo "PHASE ID: ${PHASE_ID}"
           echo "BUILD NUMBER: ${BUILD_NUMBER}"
           echo "Setting PHASE ID to b"
           echo "PHASE_ID=b" >> $GITHUB_ENV
+
+      - name: Setup build environment for feature branches
+        if: contains(github.ref,'refs/heads/feature')
+        run: |
+          echo "PHASE ID: ${PHASE_ID}"
+          echo "BUILD NUMBER: ${BUILD_NUMBER}"
+          echo "Setting PHASE ID to f"
+          echo "PHASE_ID=f" >> $GITHUB_ENV
 
       - name: Setup build environment for release tags
         if: contains(github.ref,'refs/tags/LIB')
