@@ -116,15 +116,19 @@ jobs:
     steps:
       - name: Trigger - steves-test-repo2 event
         run: |
-          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/dispatches \
+          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/actions/workflows/push.yml/dispatches \
           -H 'Accept: application/vnd.github.v3+json' \
           -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
-          -d '{"event_type": "trigger", 
-                "client_payload": { 
-                  "ref": "${{ github.ref }}", 
-                  "LIB_BRANCH_OR_TAG": "'"${{needs.linux-build.outputs.BRANCH_OR_TAG}}"'" 
-                }
-              }'
+          -d '{"ref":"${{ github.ref }}"}'
+#          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/dispatches \
+#          -H 'Accept: application/vnd.github.v3+json' \
+#          -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
+#          -d '{"event_type": "trigger", 
+#                "client_payload": { 
+#                  "ref": "${{ github.ref }}", 
+#                  "LIB_BRANCH_OR_TAG": "'"${{needs.linux-build.outputs.BRANCH_OR_TAG}}"'" 
+#                }
+#              }'
 
       - name: Dump context
         if: ${{ env.DISPLAY_CONTEXT == 'true' }}
