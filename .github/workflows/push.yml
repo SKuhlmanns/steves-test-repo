@@ -112,6 +112,7 @@ jobs:
           -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
           -d '{"event_type": "trigger", 
                 "client_payload": { 
+                  "ref": "${{ github.ref }}", 
                   "LIB_BRANCH_OR_TAG": "'"${{needs.linux-build.outputs.BRANCH_OR_TAG}}"'" 
                 }
               }'
