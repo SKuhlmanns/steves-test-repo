@@ -5,7 +5,7 @@ on:
     branches:
       # Push events on develop branch
       - develop
-      # Push events on release branches
+      # Push events on release and feature branches
       - 'release_v*'
       - 'release/release_v*'
       - 'feature/**'
@@ -13,7 +13,7 @@ on:
       - LIB_*    # Push events matching refs/heads/LIB_* tags
   repository_dispatch:
 env:
-  DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }}
+  DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }} # To display github context for debugging
 
 jobs:
 
@@ -100,12 +100,13 @@ jobs:
           echo
           echo "$STEPS_CONTEXT"
 
+  # Trigger the downstream project(s)/repos
+
   linux-trigger:
     needs: linux-build
     runs-on: ubuntu-latest
     steps:
       - name: Trigger - steves-test-repo2 event
-#        if: github.event.action != 'pong'
         run: |
           curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/dispatches \
           -H 'Accept: application/vnd.github.v3+json' \
@@ -123,6 +124,9 @@ jobs:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
           JOB_CONTEXT: ${{ toJSON(job) }}
           STEPS_CONTEXT: ${{ toJSON(steps) }}
+#          RUNNER_CONTEXT: ${{ toJSON(runner) }}
+#          STRATEGY_CONTEXT: ${{ toJSON(strategy) }}
+#          MATRIX_CONTEXT: ${{ toJSON(matrix) }}
         run: |
           echo "GITHUB CONTEXT:"
           echo
@@ -135,46 +139,15 @@ jobs:
           echo "STEPS CONTEXT:"
           echo
           echo "$STEPS_CONTEXT"
-
-#      - name: ACK - Acknowledge pong from remote repository
-#        if: github.event.action == 'pong'
-#        run: |
-#          echo "PONG received from '${{ github.event.client_payload.repository }}'" && \
-#          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/dispatches \
-#          -H 'Accept: application/vnd.github.v3+json' \
-#          -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
-#          --data '{"event_type": "ack", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
-
-#  linux-context:
-#    needs: linux-trigger
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Dump GitHub context
-#        env:
-#          GITHUB_CONTEXT: ${{ toJSON(github) }}
-#        run: echo "$GITHUB_CONTEXT"
-#
-#      - name: Dump job context
-#        env:
-#          JOB_CONTEXT: ${{ toJSON(job) }}
-#        run: echo "$JOB_CONTEXT"
-#
-#      - name: Dump steps context
-#        env:
-#          STEPS_CONTEXT: ${{ toJSON(steps) }}
-#        run: echo "$STEPS_CONTEXT"
-#
-#      - name: Dump runner context
-#        env:
-#          RUNNER_CONTEXT: ${{ toJSON(runner) }}
-#        run: echo "$RUNNER_CONTEXT"
-#
-#      - name: Dump strategy context
-#        env:
-#          STRATEGY_CONTEXT: ${{ toJSON(strategy) }}
-#        run: echo "$STRATEGY_CONTEXT"
-#
-#      - name: Dump matrix context
-#        env:
-#          MATRIX_CONTEXT: ${{ toJSON(matrix) }}
-#        run: echo "$MATRIX_CONTEXT"
+#         echo
+#         echo "RUNNER CONTEXT:"
+#         echo
+#         echo "$RUNNER_CONTEXT"
+#         echo
+#         echo "STRATEGY CONTEXT:"
+#         echo
+#         echo "$STRATEGY_CONTEXT"
+#         echo
+#         echo "MATRIX CONTEXT:"
+#         echo
+#         echo "$MATRIX_CONTEXT"

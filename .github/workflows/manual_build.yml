@@ -19,11 +19,14 @@ on:
 #        description: 'Git Branch Name'
 #        required: true
 #        default: 'release_v4.3'
+env:
+  DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }} # To display github context for debugging
 
 jobs:
 
-  build-linux:
+  linux-build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     env:
       BUILD_NUMBER: ${{ github.run_number }}
 
@@ -35,22 +38,6 @@ jobs:
         run: |
           BRANCH_OR_TAG=`basename ${{ github.ref }}`
           echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
-
-#      - name: Setup build environment for release branches
-#        if: contains(github.ref,'refs/heads/release_v')
-#        run: |
-#          echo "PHASE ID: ${PHASE_ID}"
-#          echo "BUILD NUMBER: ${BUILD_NUMBER}"
-#          echo "Setting PHASE ID to b"
-#          echo "PHASE_ID=b" >> $GITHUB_ENV
-
-#      - name: Setup build environment for release tags
-#        if: contains(github.ref,'refs/tags/LIB')
-#        run: |
-#          echo "PHASE ID: ${PHASE_ID}"
-#          echo "BUILD NUMBER: ${BUILD_NUMBER}"
-#          echo "Setting PHASE ID to blank"
-#          echo "PHASE_ID=" >> $GITHUB_ENV
 
       - name: Build the application
         working-directory: build
@@ -80,46 +67,22 @@ jobs:
           name: version-num-${{ env.BRANCH_OR_TAG }}-txt
           path: |
             build/version_num.txt
-      - name: Dump GitHub context
+
+      - name: Dump context
+        if: ${{ env.DISPLAY_CONTEXT == 'true' }}
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
-        run: echo "$GITHUB_CONTEXT"
-
-      - name: Dump job context
-        env:
           JOB_CONTEXT: ${{ toJSON(job) }}
-        run: echo "$JOB_CONTEXT"
-
-      - name: Dump steps context
-        env:
           STEPS_CONTEXT: ${{ toJSON(steps) }}
-        run: echo "$STEPS_CONTEXT"
-
-      - name: Dump runner context
-        env:
-          RUNNER_CONTEXT: ${{ toJSON(runner) }}
-        run: echo "$RUNNER_CONTEXT"
-
-      - name: Dump strategy context
-        env:
-          STRATEGY_CONTEXT: ${{ toJSON(strategy) }}
-        run: echo "$STRATEGY_CONTEXT"
-
-      - name: Dump matrix context
-        env:
-          MATRIX_CONTEXT: ${{ toJSON(matrix) }}
-        run: echo "$MATRIX_CONTEXT"
-
-#      - name: Trigger - steves-test-repo2 event
-#        if: github.event.action != 'pong'
-#        run: |
-#          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/dispatches \
-#          -H 'Accept: application/vnd.github.v3+json' \
-#          -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
-#          -d '{"event_type": "trigger", 
-#                "client_payload": { 
-#                  "repository": "'"$GITHUB_REPOSITORY"'", 
-#                  "ref": "${{ github.ref }}", 
-#                  "LIB_BRANCH_OR_TAG": "'"${{ env.BRANCH_OR_TAG }}"'" 
-#                }
-#              }'
+        run: |
+          echo "GITHUB CONTEXT:"
+          echo
+          echo "$GITHUB_CONTEXT"
+          echo
+          echo "JOB CONTEXT:"
+          echo
+          echo "$JOB_CONTEXT"
+          echo
+          echo "STEPS CONTEXT:"
+          echo
+          echo "$STEPS_CONTEXT"
