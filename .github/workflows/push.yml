@@ -12,7 +12,7 @@ on:
       - 'feature*'
     tags:
       - LIB_*    # Push events matching refs/heads/LIB_* tags
-  create:
+#  create: Not needed because push event is triggered
 #  repository_dispatch:
 env:
   DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }} # To display github context for debugging
