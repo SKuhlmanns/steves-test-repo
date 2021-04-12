@@ -9,9 +9,11 @@ on:
       - 'release_v*'
       - 'release/release_v*'
       - 'feature/**'
+      - 'feature*'
     tags:
       - LIB_*    # Push events matching refs/heads/LIB_* tags
-  repository_dispatch:
+  create:
+#  repository_dispatch:
 env:
   DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }} # To display github context for debugging
 
