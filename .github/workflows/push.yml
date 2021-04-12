@@ -23,18 +23,18 @@ jobs:
     env:
       BUILD_NUMBER: ${{ github.run_number }}
       PHASE_ID: x
-    outputs:
-      BRANCH_OR_TAG: ${{ steps.branchname.outputs.branch_or_tag }}
+#    outputs:
+#      BRANCH_OR_TAG: ${{ steps.branchname.outputs.branch_or_tag }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Get branch or tag name from git reference
-        id: branchname
-        run: |
-          BRANCH_OR_TAG=`basename ${{ github.ref }}`
-          echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
-          echo "::set-output name=branch_or_tag::${BRANCH_OR_TAG}"
+#      - name: Get branch or tag name from git reference
+#        id: branchname
+#        run: |
+#          BRANCH_OR_TAG=`basename ${{ github.ref }}`
+#          echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
+#          echo "::set-output name=branch_or_tag::${BRANCH_OR_TAG}"
 
       - name: Setup build environment for release branches
         if: contains(github.ref,'refs/heads/release')
