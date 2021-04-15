@@ -17,36 +17,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Build the application
-        working-directory: build
+      - name: Set branch from git reference
         run: |
-          export VER_NUM=`cat version.txt`
-          echo ${VER_NUM}${PHASE_ID}-${BUILD_NUMBER} > version_num.txt
-          echo "PHASE ID: ${PHASE_ID}"
-          echo "BUILD NUMBER: ${BUILD_NUMBER}"
-          cat version_num.txt
-          echo ${{github.repository}}
-          bash bbuild.sh ..
+          BRANCH_NAME=`echo ${{ github.head_ref }} | tr "/" "-"`
+          echo "BRANCH_NAME: ${BRANCH_NAME}"
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
 
-      - name: Upload version.txt artifact
-        if: ${{ success() }}
-        uses: actions/upload-artifact@v2
-        with:
-          #name: version-${{ github.head_ref }}-txt
-          name: version-txt
-          path: |
-            build/version.txt
-
-      - name: Upload version_num.txt artifact
-        if: ${{ success() }}
-        uses: actions/upload-artifact@v2
-        with:
-          #name: version-num-${{ github.head_ref }}-txt
-          name: version-num-txt
-          path: |
-            build/version_num.txt
-
+      # Use this to help debug issues
       - name: Dump context
+        # See Settings -> Secrets to turn this step on and off
         if: ${{ env.DISPLAY_CONTEXT == 'true' }}
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
@@ -64,3 +43,30 @@ jobs:
           echo "STEPS CONTEXT:"
           echo
           echo "$STEPS_CONTEXT"
+
+      - name: Build the application
+        working-directory: build
+        run: |
+          export VER_NUM=`cat version.txt`
+          echo ${VER_NUM}${PHASE_ID}-${BUILD_NUMBER} > version_num.txt
+          echo "PHASE ID: ${PHASE_ID}"
+          echo "BUILD NUMBER: ${BUILD_NUMBER}"
+          cat version_num.txt
+          echo ${{github.repository}}
+          bash bbuild.sh ..
+
+      - name: Upload version.txt artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: version-${{ env.BRANCH_NAME }}-txt
+          path: |
+            build/version.txt
+
+      - name: Upload version_num.txt artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: version-num-${{ env.BRANCH_NAME }}-txt
+          path: |
+            build/version_num.txt
