@@ -8,8 +8,8 @@ on:
       # Push events on release and feature branches
       - 'release_v*'
       - 'release/release_v*'
-    tags:
-      - LIB_*    # Push events matching refs/heads/LIB_* tags
+#    tags:
+#      - LIB_*    # Push events matching refs/heads/LIB_* tags
 #  create: Not needed because push event is triggered
 #  repository_dispatch:
 env:
