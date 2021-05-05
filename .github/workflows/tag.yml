@@ -58,12 +58,6 @@ jobs:
           echo "BRANCH_OR_TAG: ${BRANCH_OR_TAG}"
           echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
 
-      - name: Display contents
-        working-directory: builder
-        run: |
-          ls -l
-          cat *.txt
-
       - name: Setup build environment for release tags
         if: contains(github.ref,'refs/tags/LIB')
         run: |
