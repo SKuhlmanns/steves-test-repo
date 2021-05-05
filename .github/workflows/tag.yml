@@ -1,0 +1,131 @@
+name: Build tagged releases
+
+on: 
+  push:
+    tags:
+      - LIB_*    # Push events matching refs/heads/LIB_* tags
+      - NOVOS_*   # Push events matching refs/heads/NOVOS_* tags
+  workflow_dispatch:
+
+env:
+  DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }}    # To display github context for debugging
+
+jobs:
+
+  linux-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BUILD_NUMBER: ${{ github.run_number }}
+      PHASE_ID: x
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Make builder directory
+        run: |
+          mkdir -p builder
+
+      # Use this to help debug issues
+      - name: Dump context
+        # See Settings -> Secrets to turn this step on and off
+        if: ${{ env.DISPLAY_CONTEXT == 'true' }}
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+          JOB_CONTEXT: ${{ toJSON(job) }}
+          STEPS_CONTEXT: ${{ toJSON(steps) }}
+        run: |
+          echo "GITHUB CONTEXT:"
+          echo
+          echo "$GITHUB_CONTEXT"
+          echo
+          echo "JOB CONTEXT:"
+          echo
+          echo "$JOB_CONTEXT"
+          echo
+          echo "STEPS CONTEXT:"
+          echo
+          echo "$STEPS_CONTEXT"
+
+      - name: Set branch or tag name from git reference
+        run: |
+          BRANCH_OR_TAG=`basename ${{ github.ref }}`
+          if [[ $BRANCH_OR_TAG == 'LIB'* ]]; then
+            VERSION=`echo $BRANCH_OR_TAG | cut -d"_" -f2`
+            BRANCH_OR_TAG="LIB_${VERSION}"
+          fi
+          echo "BRANCH_OR_TAG: ${BRANCH_OR_TAG}"
+          echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
+
+      - name: Download artifacts from steves-test-repo
+        uses: aochmann/actions-download-artifact@1.0.4
+        with:
+          # Optional, GitHub token
+          github_token: ${{ secrets.KUHLMANNS_TOKEN }}
+
+          # Optional, uploaded artifact name,
+          # will download all artifacts if not specified
+          # and extract them in respective subdirectories
+          # https://github.com/actions/download-artifact#download-all-artifacts
+          name: version-num-${{ env.BRANCH_OR_TAG }}-txt
+
+          # Optional, download latest artifact
+          latest: true
+
+          # Optional, directory where to extract artifact
+          path: builder
+
+          # Optional, defaults to current repo
+          repo: SKuhlmanns/steves-test-repo
+
+      - name: Display contents
+        working-directory: builder
+        run: |
+          ls -l
+          cat *.txt
+
+      - name: Setup build environment for release tags
+        if: contains(github.ref,'refs/tags/LIB')
+        run: |
+          echo "PHASE ID: ${PHASE_ID}"
+          echo "BUILD NUMBER: ${BUILD_NUMBER}"
+          echo "Setting PHASE ID to blank"
+          echo "PHASE_ID=" >> $GITHUB_ENV
+
+      - name: Setup build environment for release tags
+        if: contains(github.ref,'refs/tags/NOVOS')
+        run: |
+          echo "PHASE ID: ${PHASE_ID}"
+          echo "BUILD NUMBER: ${BUILD_NUMBER}"
+          echo "Setting PHASE ID to blank"
+          echo "PHASE_ID=" >> $GITHUB_ENV
+
+      - name: Build the application
+        working-directory: build
+        run: |
+          echo "Repo Owner:" ${{ github.repository_owner }}
+          echo "Run ID:" ${{ github.run_id }}
+
+          export VER_NUM=`cat version.txt` 
+          echo "${VER_NUM}${{ env.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
+          PHASE_ID=${{ env.PHASE_ID }}
+          echo "PHASE ID: ${PHASE_ID}"
+          cat version_num.txt
+          bash bbuild.sh .. 
+
+      - name: Upload version.txt artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: version-${{ env.BRANCH_OR_TAG }}-txt
+          path: |
+            build/version.txt
+
+      - name: Upload version_num.txt artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: version-num-${{ env.BRANCH_OR_TAG }}-txt
+          path: |
+            build/version_num.txt

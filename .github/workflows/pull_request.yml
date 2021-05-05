@@ -1,12 +1,13 @@
 name: Build on pull request
 
 on: pull_request
+
 env:
-  DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }} # To display github context for debugging
+  DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }}    # To display github context for debugging
 
 jobs:
 
-  linux-build:
+  build-linux:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:

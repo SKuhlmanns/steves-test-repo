@@ -8,12 +8,10 @@ on:
       # Push events on release and feature branches
       - 'release_v*'
       - 'release/release_v*'
-    tags:
-      - LIB_*    # Push events matching refs/heads/LIB_* tags
-#  create: Not needed because push event is triggered
-#  repository_dispatch:
+  workflow_dispatch:    # May not be needed since it has no parent projects
+
 env:
-  DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }} # To display github context for debugging
+  DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }}    # To display github context for debugging
 
 jobs:
 
@@ -23,8 +21,7 @@ jobs:
     env:
       BUILD_NUMBER: ${{ github.run_number }}
       PHASE_ID: x
-#    outputs:
-#      BRANCH_OR_TAG: ${{ steps.branchname.outputs.branch_or_tag }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -34,10 +31,9 @@ jobs:
         run: |
           BRANCH_OR_TAG=`basename ${{ github.ref }}`
           echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
-#          echo "::set-output name=branch_or_tag::${BRANCH_OR_TAG}"
 
       - name: Setup build environment for release branches
-        if: contains(github.ref,'refs/heads/release')
+        if: contains(github.ref,'release')
         run: |
           echo "PHASE ID: ${PHASE_ID}"
           echo "BUILD NUMBER: ${BUILD_NUMBER}"
@@ -45,20 +41,12 @@ jobs:
           echo "PHASE_ID=b" >> $GITHUB_ENV
 
       - name: Setup build environment for feature branches
-        if: contains(github.ref,'refs/heads/feature')
+        if: contains(github.ref,'feature')
         run: |
           echo "PHASE ID: ${PHASE_ID}"
           echo "BUILD NUMBER: ${BUILD_NUMBER}"
           echo "Setting PHASE ID to f"
           echo "PHASE_ID=f" >> $GITHUB_ENV
-
-      - name: Setup build environment for release tags
-        if: contains(github.ref,'refs/tags/LIB')
-        run: |
-          echo "PHASE ID: ${PHASE_ID}"
-          echo "BUILD NUMBER: ${BUILD_NUMBER}"
-          echo "Setting PHASE ID to blank"
-          echo "PHASE_ID=" >> $GITHUB_ENV
 
       - name: Build the application
         working-directory: build
@@ -89,7 +77,9 @@ jobs:
           path: |
             build/version_num.txt
  
+      # Use this to help debug issues
       - name: Dump context
+        # See Settings -> Secrets to turn this step on and off
         if: ${{ env.DISPLAY_CONTEXT == 'true' }}
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
@@ -120,46 +110,3 @@ jobs:
           -H 'Accept: application/vnd.github.v3+json' \
           -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
           -d '{"ref":"${{ github.ref }}"}'
-#          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/dispatches \
-#          -H 'Accept: application/vnd.github.v3+json' \
-#          -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
-#          -d '{"event_type": "trigger", 
-#                "client_payload": { 
-#                  "ref": "${{ github.ref }}", 
-#                  "LIB_BRANCH_OR_TAG": "'"${{needs.linux-build.outputs.BRANCH_OR_TAG}}"'" 
-#                }
-#              }'
-
-      - name: Dump context
-        if: ${{ env.DISPLAY_CONTEXT == 'true' }}
-        env:
-          GITHUB_CONTEXT: ${{ toJSON(github) }}
-          JOB_CONTEXT: ${{ toJSON(job) }}
-          STEPS_CONTEXT: ${{ toJSON(steps) }}
-#          RUNNER_CONTEXT: ${{ toJSON(runner) }}
-#          STRATEGY_CONTEXT: ${{ toJSON(strategy) }}
-#          MATRIX_CONTEXT: ${{ toJSON(matrix) }}
-        run: |
-          echo "GITHUB CONTEXT:"
-          echo
-          echo "$GITHUB_CONTEXT"
-          echo
-          echo "JOB CONTEXT:"
-          echo
-          echo "$JOB_CONTEXT"
-          echo
-          echo "STEPS CONTEXT:"
-          echo
-          echo "$STEPS_CONTEXT"
-#         echo
-#         echo "RUNNER CONTEXT:"
-#         echo
-#         echo "$RUNNER_CONTEXT"
-#         echo
-#         echo "STRATEGY CONTEXT:"
-#         echo
-#         echo "$STRATEGY_CONTEXT"
-#         echo
-#         echo "MATRIX CONTEXT:"
-#         echo
-#         echo "$MATRIX_CONTEXT"
