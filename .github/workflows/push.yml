@@ -8,7 +8,8 @@ on:
       # Push events on release and feature branches
       - 'release_v*'
       - 'release/release_v*'
-  workflow_dispatch:    # May not be needed since it has no parent projects
+  workflow_dispatch:    # May only be needed to rebuild project when needed
+                        # It has no parent projects
 
 env:
   DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }}    # To display github context for debugging

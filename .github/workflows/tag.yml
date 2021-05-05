@@ -3,7 +3,7 @@ name: Build tagged releases
 on: 
   push:
     tags:
-      - LIB_*    # Push events matching refs/heads/LIB_* tags
+      - LIB_*     # Push events matching refs/heads/LIB_* tags
       - NOVOS_*   # Push events matching refs/heads/NOVOS_* tags
   workflow_dispatch:
 

@@ -1,13 +1,15 @@
 name: Build on pull request
 
-on: pull_request
+on: 
+  pull_request:
+  workflow_dispatch:    # May be needed to rebuild project that has failed 
 
 env:
   DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }}    # To display github context for debugging
 
 jobs:
 
-  build-linux:
+  linux-build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
