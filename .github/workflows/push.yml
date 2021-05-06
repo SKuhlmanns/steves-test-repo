@@ -9,7 +9,8 @@ on:
       - 'release_v*'
       - 'release/release_v*'
       # Push events on feature branches
-      - 'feature*'
+      - 'feature/**'
+      - '*feature*'
   workflow_dispatch:    # May only be needed to rebuild project when needed
                         # It has no parent projects
 
