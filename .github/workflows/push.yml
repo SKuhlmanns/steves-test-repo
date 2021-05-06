@@ -5,9 +5,11 @@ on:
     branches:
       # Push events on develop branch
       - develop
-      # Push events on release and feature branches
+      # Push events on release branches
       - 'release_v*'
       - 'release/release_v*'
+      # Push events on feature branches
+      - 'feature*'
   workflow_dispatch:    # May only be needed to rebuild project when needed
                         # It has no parent projects
 
@@ -22,6 +24,7 @@ jobs:
     env:
       BUILD_NUMBER: ${{ github.run_number }}
       PHASE_ID: x
+      CHILD_YAML: push.yml
 
     steps:
       - name: Checkout code
@@ -40,6 +43,7 @@ jobs:
           echo "BUILD NUMBER: ${BUILD_NUMBER}"
           echo "Setting PHASE ID to b"
           echo "PHASE_ID=b" >> $GITHUB_ENV
+          echo "CHILD_YAML=release.yml" >> $GITHUB_ENV
 
       - name: Setup build environment for feature branches
         if: contains(github.ref,'feature')
@@ -48,6 +52,7 @@ jobs:
           echo "BUILD NUMBER: ${BUILD_NUMBER}"
           echo "Setting PHASE ID to f"
           echo "PHASE_ID=f" >> $GITHUB_ENV
+          echo "CHILD_YAML=feature.yml" >> $GITHUB_ENV
 
       - name: Build the application
         working-directory: build
@@ -101,13 +106,13 @@ jobs:
 
   # Trigger the downstream project(s)/repos
 
-  linux-trigger:
+  linux-triggers:
     needs: linux-build
     runs-on: ubuntu-latest
     steps:
       - name: Trigger - steves-test-repo2 event
         run: |
-          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/actions/workflows/push.yml/dispatches \
+          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/actions/workflows/${{ env.CHILD_YAML }}/dispatches \
           -H 'Accept: application/vnd.github.v3+json' \
           -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
           -d '{"ref":"${{ github.ref }}"}'
