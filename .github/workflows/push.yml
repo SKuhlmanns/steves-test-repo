@@ -89,9 +89,9 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: run_id-${{ env.BRANCH_OR_TAG }}-txt
+          name: run_id-${{ env.BRANCH_OR_TAG }}.txt
           path: |
-            build/run_id-${{ env.BRANCH_OR_TAG }}-txt
+            build/run_id-${{ env.BRANCH_OR_TAG }}.txt
 
       - name: Generate list of run artifacts
         run: |
