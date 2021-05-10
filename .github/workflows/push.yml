@@ -60,6 +60,7 @@ jobs:
         run: |
           echo "Repo Owner:" ${{ github.repository_owner }}
           echo "Run ID:" ${{ github.run_id }}
+          echo ${{ github.run_id }} > run_id-${{ env.BRANCH_OR_TAG }}.txt
 
           export VER_NUM=`cat version.txt` 
           echo "${VER_NUM}${{ env.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
@@ -83,6 +84,14 @@ jobs:
           name: version-num-${{ env.BRANCH_OR_TAG }}-txt
           path: |
             build/version_num.txt
+
+      - name: Upload run_id artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: run_id-${{ env.BRANCH_OR_TAG }}-txt
+          path: |
+            build/run_id-${{ env.BRANCH_OR_TAG }}-txt
 
       - name: Generate list of run artifacts
         run: |
