@@ -86,7 +86,7 @@ jobs:
 
       - name: Generate list of run artifacts
         run: |
-          curl -H "Authorization: token ${{ secrets.KUHLMANNS_CURL_TOKEN }}" \
+          curl \
           -sL https://api.github.com/repos/SKuhlmanns/steves-test-repo/actions/runs/${{ github.run_id }}/artifacts \
           -o artifact-${{ env.BRANCH_OR_TAG }}-list.txt
 
