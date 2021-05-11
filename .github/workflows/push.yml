@@ -93,20 +93,21 @@ jobs:
           path: |
             build/run_id-${{ env.BRANCH_OR_TAG }}.txt
 
-      - name: Generate list of run artifacts
-        run: |
-          curl \
-          -sL https://api.github.com/repos/SKuhlmanns/steves-test-repo/actions/runs/${{ github.run_id }}/artifacts \
-          -o artifact-${{ env.BRANCH_OR_TAG }}-list.txt
-          cat artifact-${{ env.BRANCH_OR_TAG }}-list.txt
+      # Does not find any artifacts
+      #- name: Generate list of run artifacts
+      #  run: |
+      #    curl \
+      #    -sL https://api.github.com/repos/SKuhlmanns/steves-test-repo/actions/runs/${{ github.run_id }}/artifacts \
+      #    -o artifact-${{ env.BRANCH_OR_TAG }}-list.txt
+      #    cat artifact-${{ env.BRANCH_OR_TAG }}-list.txt
 
-      - name: Upload run artifact list text file
-        if: ${{ success() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: artifact-${{ env.BRANCH_OR_TAG }}-list.txt
-          path: |
-            artifact-${{ env.BRANCH_OR_TAG }}-list.txt
+      #- name: Upload run artifact list text file
+      #  if: ${{ success() }}
+      #  uses: actions/upload-artifact@v2
+      #  with:
+      #    name: artifact-${{ env.BRANCH_OR_TAG }}-list.txt
+      #    path: |
+      #      artifact-${{ env.BRANCH_OR_TAG }}-list.txt
  
       # Use this to help debug issues
       - name: Dump context
@@ -136,6 +137,8 @@ jobs:
           -H 'Accept: application/vnd.github.v3+json' \
           -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
           -d '{"ref":"${{ github.ref }}"}'
+
+#  
 
 #  # Trigger the downstream project(s)/repos
 #
