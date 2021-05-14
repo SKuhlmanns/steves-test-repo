@@ -149,7 +149,7 @@ jobs:
     steps:
       - name: Trigger - steves-test-repo2 event
         run: |
-          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/actions/workflows/push.yml/dispatches \
+          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/actions/workflows/develop.yml/dispatches \
           -H 'Accept: application/vnd.github.v3+json' \
           -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
           -d '{"ref":"${{ github.ref }}"}'
