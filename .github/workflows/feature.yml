@@ -1,11 +1,13 @@
-name: Build tagged releases
+name: Build feature branch
 
 on: 
   push:
-    tags:
-      - LIB_*     # Push events matching refs/heads/LIB_* tags
-      - NOVOS_*   # Push events matching refs/heads/NOVOS_* tags
-  workflow_dispatch:
+    branches:
+      # Push events on feature branches
+      - 'feature/**'
+      - '*feature*'
+  workflow_dispatch:    # May only be needed to rebuild project when needed
+                        # It has no parent projects
 
 env:
   DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }}    # To display github context for debugging
@@ -17,15 +19,57 @@ jobs:
     timeout-minutes: 30
     env:
       BUILD_NUMBER: ${{ github.run_number }}
-      PHASE_ID: 
+      PHASE_ID: f
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Make builder directory
+      - name: Set branch name from github reference
         run: |
-          mkdir -p builder
+          BRANCH_OR_TAG=`basename ${{ github.ref }}`
+          echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
+
+      - name: Build the application
+        working-directory: build
+        run: |
+          echo "Repo Owner:" ${{ github.repository_owner }}
+          echo "Run ID:" ${{ github.run_id }}
+          echo ${{ github.run_id }} > run_id-${{ env.BRANCH_OR_TAG }}.txt
+
+          export VER_NUM=`cat version.txt` 
+          echo "${VER_NUM}${{ env.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
+          PHASE_ID=${{ env.PHASE_ID }}
+          echo "PHASE ID: ${PHASE_ID}"
+          cat version_num.txt
+          bash bbuild.sh .. 
+
+      - name: Upload version.txt artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: version-${{ env.BRANCH_OR_TAG }}-txt
+          retention-days: 45
+          path: |
+            build/version.txt
+
+      - name: Upload version_num.txt artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: version-num-${{ env.BRANCH_OR_TAG }}-txt
+          retention-days: 45
+          path: |
+            build/version_num.txt
+
+      - name: Upload run_id artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: run_id-${{ env.BRANCH_OR_TAG }}.txt
+          retention-days: 45
+          path: |
+            build/run_id-${{ env.BRANCH_OR_TAG }}.txt
 
       # Use this to help debug issues
       - name: Dump context
@@ -48,53 +92,15 @@ jobs:
           echo
           echo "$STEPS_CONTEXT"
 
-      - name: Set branch or tag name from github reference
+  # Trigger the downstream project(s)/repos
+
+  linux-triggers:
+    needs: linux-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger - steves-test-repo2 event
         run: |
-          BRANCH_OR_TAG=`basename ${{ github.ref }}`
-          if [[ $BRANCH_OR_TAG == 'LIB'* ]]; then
-            VERSION=`echo $BRANCH_OR_TAG | cut -d"_" -f2`
-            BRANCH_OR_TAG="LIB_${VERSION}"
-          fi
-          echo "BRANCH_OR_TAG: ${BRANCH_OR_TAG}"
-          echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
-
-      - name: Build the application
-        working-directory: build
-        run: |
-          echo "Repo Owner:" ${{ github.repository_owner }}
-          echo "Run ID:" ${{ github.run_id }}
-          echo ${{ github.run_id }} > run_id-${{ env.BRANCH_OR_TAG }}.txt
-
-          export VER_NUM=`cat version.txt` 
-          echo "${VER_NUM}${{ env.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
-          PHASE_ID=${{ env.PHASE_ID }}
-          echo "PHASE ID: ${PHASE_ID}"
-          cat version_num.txt
-          bash bbuild.sh .. 
-
-      - name: Upload version.txt artifact
-        if: ${{ success() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: version-${{ env.BRANCH_OR_TAG }}-txt
-          retention-days: 90
-          path: |
-            build/version.txt
-
-      - name: Upload version_num.txt artifact
-        if: ${{ success() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: version-num-${{ env.BRANCH_OR_TAG }}-txt
-          retention-days: 90
-          path: |
-            build/version_num.txt
-
-      - name: Upload run_id artifact
-        if: ${{ success() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: run_id-${{ env.BRANCH_OR_TAG }}.txt
-          retention-days: 90
-          path: |
-            build/run_id-${{ env.BRANCH_OR_TAG }}.txt
+          curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/actions/workflows/feature.yml/dispatches \
+          -H 'Accept: application/vnd.github.v3+json' \
+          -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
+          -d '{"ref":"${{ github.ref }}"}'
