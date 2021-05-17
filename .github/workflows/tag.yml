@@ -48,22 +48,22 @@ jobs:
           echo
           echo "$STEPS_CONTEXT"
 
-      - name: Set branch or tag name from github reference
+      - name: Set tag name from github reference
         run: |
-          BRANCH_OR_TAG=`basename ${{ github.ref }}`
-          if [[ $BRANCH_OR_TAG == 'LIB'* ]]; then
-            VERSION=`echo $BRANCH_OR_TAG | cut -d"_" -f2`
-            BRANCH_OR_TAG="LIB_${VERSION}"
-          fi
-          echo "BRANCH_OR_TAG: ${BRANCH_OR_TAG}"
-          echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
+          LIB_TAG_NAME=`basename ${{ github.ref }}`
+          #if [[ $LIB_TAG_NAME == 'LIB'* ]]; then
+          #  VERSION=`echo $LIB_TAG_NAME | cut -d"_" -f2`
+          #  LIB_TAG_NAME="LIB_${VERSION}"
+          #fi
+          echo "LIB_TAG_NAME: ${LIB_TAG_NAME}"
+          echo "LIB_TAG_NAME=${LIB_TAG_NAME}" >> $GITHUB_ENV
 
       - name: Build the application
         working-directory: build
         run: |
           echo "Repo Owner:" ${{ github.repository_owner }}
           echo "Run ID:" ${{ github.run_id }}
-          echo ${{ github.run_id }} > run_id-${{ env.BRANCH_OR_TAG }}.txt
+          echo ${{ github.run_id }} > run_id-${{ env.LIB_TAG_NAME }}.txt
 
           export VER_NUM=`cat version.txt` 
           echo "${VER_NUM}${{ env.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
@@ -76,7 +76,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-${{ env.BRANCH_OR_TAG }}-txt
+          name: version-${{ env.LIB_TAG_NAME }}-txt
           retention-days: 90
           path: |
             build/version.txt
@@ -85,7 +85,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-num-${{ env.BRANCH_OR_TAG }}-txt
+          name: version-num-${{ env.LIB_TAG_NAME }}-txt
           retention-days: 90
           path: |
             build/version_num.txt
@@ -94,7 +94,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: run_id-${{ env.BRANCH_OR_TAG }}.txt
+          name: run_id-${{ env.LIB_TAG_NAME }}.txt
           retention-days: 90
           path: |
-            build/run_id-${{ env.BRANCH_OR_TAG }}.txt
+            build/run_id-${{ env.LIB_TAG_NAME }}.txt
