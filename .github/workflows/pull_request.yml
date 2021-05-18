@@ -20,7 +20,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set branch from git reference
+      - name: Set branch from github reference
         run: |
           BRANCH_NAME=`echo ${{ github.head_ref }} | tr "/" "-"`
           echo "BRANCH_NAME: ${BRANCH_NAME}"

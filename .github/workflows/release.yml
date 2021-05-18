@@ -27,15 +27,16 @@ jobs:
 
       - name: Set branch name from github reference
         run: |
-          BRANCH_OR_TAG=`basename ${{ github.ref }}`
-          echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
+          BRANCH_NAME=`basename ${{ github.ref }}`
+          echo "BRANCH_NAME: ${BRANCH_NAME}"
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
 
       - name: Build the application
         working-directory: build
         run: |
           echo "Repo Owner:" ${{ github.repository_owner }}
           echo "Run ID:" ${{ github.run_id }}
-          echo ${{ github.run_id }} > run_id-${{ env.BRANCH_OR_TAG }}.txt
+          echo ${{ github.run_id }} > run_id-${{ env.BRANCH_NAME }}.txt
 
           export VER_NUM=`cat version.txt` 
           echo "${VER_NUM}${{ env.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
@@ -48,7 +49,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-${{ env.BRANCH_OR_TAG }}-txt
+          name: version-${{ env.BRANCH_NAME }}-txt
           retention-days: 90
           path: |
             build/version.txt
@@ -57,7 +58,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-num-${{ env.BRANCH_OR_TAG }}-txt
+          name: version-num-${{ env.BRANCH_NAME }}-txt
           retention-days: 90
           path: |
             build/version_num.txt
@@ -66,10 +67,10 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: run_id-${{ env.BRANCH_OR_TAG }}.txt
+          name: run_id-${{ env.BRANCH_NAME }}.txt
           retention-days: 90
           path: |
-            build/run_id-${{ env.BRANCH_OR_TAG }}.txt
+            build/run_id-${{ env.BRANCH_NAME }}.txt
 
       # Use this to help debug issues
       - name: Dump context
@@ -93,7 +94,6 @@ jobs:
           echo "$STEPS_CONTEXT"
 
   # Trigger the downstream project(s)/repos
-
   linux-triggers:
     needs: linux-build
     runs-on: ubuntu-latest

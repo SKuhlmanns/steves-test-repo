@@ -1,4 +1,4 @@
-name: Tag and build release branches 
+name: Manual build 
 
 on: 
   workflow_dispatch:
@@ -7,18 +7,14 @@ on:
         description: 'Phase Identifier (x, f, b or null)'
         required: false
         default: ''
-      TAG:
-        description: 'Tag (N/Y)'
-        required: true
-        default: 'N'
-      TAG_NAME:
-        description: 'Git Tag Name'
-        required: false
-        default: 'NOVOS_LIB_4.3.0'
-#      BRANCH:
-#        description: 'Git Branch Name'
+#      TAG:
+#        description: 'Tag (N/Y)'
 #        required: true
-#        default: 'release_v4.3'
+#        default: 'N'
+#      TAG_NAME:
+#        description: 'Git Tag Name'
+#        required: false
+#        default: 'NOVOS_LIB_4.3.0'
 env:
   DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }} # To display github context for debugging
 
@@ -34,20 +30,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Get branch or tag name from git reference
+      - name: Set branch name from github reference
         run: |
-          BRANCH_OR_TAG=`basename ${{ github.ref }}`
-          echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
+          BRANCH_NAME=`basename ${{ github.ref }}`
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
 
       - name: Build the application
         working-directory: build
         run: |
           echo "Repo Owner:" ${{ github.repository_owner }}
           echo "Run ID:" ${{ github.run_id }}
+          echo ${{ github.run_id }} > run_id-${{ env.BRANCH_NAME }}.txt
 
           export VER_NUM=`cat version.txt` 
           echo "${VER_NUM}${{ github.event.inputs.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
           PHASE_ID=${{ github.event.inputs.PHASE_ID }}
+          echo "PHASE ID: ${PHASE_ID}"
+          echo "BUILD NUMBER: ${BUILD_NUMBER}"
           echo "PHASE ID: ${{ github.event.inputs.PHASE_ID }}"
           cat version_num.txt
           bash bbuild.sh .. 
@@ -56,7 +55,8 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-${{ env.BRANCH_OR_TAG }}-txt
+          name: version-${{ env.BRANCH_NAME }}-txt
+          retention-days: 14
           path: |
             build/version.txt
 
@@ -64,9 +64,19 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-num-${{ env.BRANCH_OR_TAG }}-txt
+          name: version-num-${{ env.BRANCH_NAME }}-txt
+          retention-days: 14
           path: |
             build/version_num.txt
+
+      - name: Upload run_id artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: run_id-${{ env.BRANCH_NAME }}.txt
+          retention-days: 14
+          path: |
+            build/run_id-${{ env.BRANCH_NAME }}.txt
 
       - name: Dump context
         if: ${{ env.DISPLAY_CONTEXT == 'true' }}

@@ -32,10 +32,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Get branch name from github reference
+      - name: Set branch name from github reference
         run: |
-          BRANCH_OR_TAG=`basename ${{ github.ref }}`
-          echo "BRANCH_OR_TAG=${BRANCH_OR_TAG}" >> $GITHUB_ENV
+          BRANCH_NAME=`basename ${{ github.ref }}`
+          echo "BRANCH_NAME: ${BRANCH_NAME}"
+          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
 
       #- name: Setup build environment for release branches
       #  if: contains(github.ref,'release')
@@ -60,7 +61,7 @@ jobs:
         run: |
           echo "Repo Owner:" ${{ github.repository_owner }}
           echo "Run ID:" ${{ github.run_id }}
-          echo ${{ github.run_id }} > run_id-${{ env.BRANCH_OR_TAG }}.txt
+          echo ${{ github.run_id }} > run_id-${{ env.BRANCH_NAME }}.txt
 
           export VER_NUM=`cat version.txt` 
           echo "${VER_NUM}${{ env.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
@@ -73,7 +74,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-${{ env.BRANCH_OR_TAG }}-txt
+          name: version-${{ env.BRANCH_NAME }}-txt
           retention-days: 30
           path: |
             build/version.txt
@@ -82,7 +83,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-num-${{ env.BRANCH_OR_TAG }}-txt
+          name: version-num-${{ env.BRANCH_NAME }}-txt
           retention-days: 30
           path: |
             build/version_num.txt
@@ -91,26 +92,26 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: run_id-${{ env.BRANCH_OR_TAG }}.txt
+          name: run_id-${{ env.BRANCH_NAME }}.txt
           retention-days: 30
           path: |
-            build/run_id-${{ env.BRANCH_OR_TAG }}.txt
+            build/run_id-${{ env.BRANCH_NAME }}.txt
 
       # Does not find any artifacts
       #- name: Generate list of run artifacts
       #  run: |
       #    curl \
       #    -sL https://api.github.com/repos/SKuhlmanns/steves-test-repo/actions/runs/${{ github.run_id }}/artifacts \
-      #    -o artifact-${{ env.BRANCH_OR_TAG }}-list.txt
-      #    cat artifact-${{ env.BRANCH_OR_TAG }}-list.txt
+      #    -o artifact-${{ env.BRANCH_NAME }}-list.txt
+      #    cat artifact-${{ env.BRANCH_NAME }}-list.txt
 
       #- name: Upload run artifact list text file
       #  if: ${{ success() }}
       #  uses: actions/upload-artifact@v2
       #  with:
-      #    name: artifact-${{ env.BRANCH_OR_TAG }}-list.txt
+      #    name: artifact-${{ env.BRANCH_NAME }}-list.txt
       #    path: |
-      #      artifact-${{ env.BRANCH_OR_TAG }}-list.txt
+      #      artifact-${{ env.BRANCH_NAME }}-list.txt
  
       # Use this to help debug issues
       - name: Dump context
@@ -142,7 +143,6 @@ jobs:
       #    -d '{"ref":"${{ github.ref }}"}'
 
   # Trigger the downstream project(s)/repos
-
   linux-triggers:
     needs: linux-build
     runs-on: ubuntu-latest
