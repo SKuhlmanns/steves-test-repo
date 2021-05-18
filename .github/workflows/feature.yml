@@ -4,8 +4,8 @@ on:
   push:
     branches:
       # Push events on feature branches
-      - 'feature/**'
-      - '*feature*'
+      - 'disable-feature/**'
+      - '*disable-feature*'
   workflow_dispatch:    # May only be needed to rebuild project when needed
                         # It has no parent projects
 
