@@ -6,7 +6,7 @@ on:
       # Push events on feature branches
       - 'disable-feature/**'
       - '*disable-feature*'
-  workflow_dispatch:    # May only be needed to rebuild project when needed
+#  workflow_dispatch:    # May only be needed to rebuild project when needed
                         # It has no parent projects
 
 env:
