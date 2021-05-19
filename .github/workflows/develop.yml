@@ -13,7 +13,8 @@ on:
       #- 'feature/**'
       #- '*feature*'
   workflow_dispatch:    # May only be needed to rebuild project when needed
-                        # It has no parent projects
+    branches:           # It has no parent projects
+      - develop
 
 env:
   DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }}    # To display github context for debugging
@@ -29,14 +30,19 @@ jobs:
       #CHILD_YAML: push.yml
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Set branch name from github reference
         run: |
           BRANCH_NAME=`basename ${{ github.ref }}`
-          echo "BRANCH_NAME: ${BRANCH_NAME}"
-          echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+          if [[ ${BRANCH_NAME} == develop ]]; then
+            echo "BRANCH_NAME: ${BRANCH_NAME}"
+            echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+          else
+            echo "Error - Must use the develop branch!"
+            exit 1
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       #- name: Setup build environment for release branches
       #  if: contains(github.ref,'release')
