@@ -24,16 +24,16 @@ jobs:
       PHASE_ID: b
 
     steps:
-      - name: Set branch name from github reference
-        run: |
-          BRANCH_NAME=`basename ${{ github.ref }}`
-          if [[ ${BRANCH_NAME} == *'release_v'* ]]; then
-            echo "BRANCH_NAME: ${BRANCH_NAME}"
-            echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
-          else 
-            echo "ERROR - Must use a release branch!"
-            exit 1
-          fi
+#      - name: Set branch name from github reference
+#        run: |
+#          BRANCH_NAME=`basename ${{ github.ref }}`
+#          if [[ ${BRANCH_NAME} == *'release_v'* ]]; then
+#            echo "BRANCH_NAME: ${BRANCH_NAME}"
+#            echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+#          else 
+#            echo "ERROR - Must use a release branch!"
+#            exit 1
+#          fi
 
       - name: Checkout code
         uses: actions/checkout@v2
@@ -42,8 +42,8 @@ jobs:
         working-directory: build
         run: |
           echo "Repo Owner:" ${{ github.repository_owner }}
-          echo "Run ID:" ${{ github.run_id }}
-          echo ${{ github.run_id }} > run_id-${{ env.BRANCH_NAME }}.txt
+#          echo "Run ID:" ${{ github.run_id }}
+#          echo ${{ github.run_id }} > run_id-${{ env.BRANCH_NAME }}.txt
 
           export VER_NUM=`cat version.txt` 
           echo "${VER_NUM}${{ env.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
@@ -56,7 +56,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-${{ env.BRANCH_NAME }}-txt
+          name: version-txt
           retention-days: 90
           path: |
             build/version.txt
@@ -65,19 +65,19 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-num-${{ env.BRANCH_NAME }}-txt
+          name: version-num-txt
           retention-days: 90
           path: |
             build/version_num.txt
 
-      - name: Upload run_id artifact
-        if: ${{ success() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: run_id-${{ env.BRANCH_NAME }}.txt
-          retention-days: 90
-          path: |
-            build/run_id-${{ env.BRANCH_NAME }}.txt
+#      - name: Upload run_id artifact
+#        if: ${{ success() }}
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: run_id-${{ env.BRANCH_NAME }}.txt
+#          retention-days: 90
+#          path: |
+#            build/run_id-${{ env.BRANCH_NAME }}.txt
 
       # Use this to help debug issues
       - name: Dump context
