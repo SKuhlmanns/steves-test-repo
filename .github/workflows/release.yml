@@ -70,15 +70,6 @@ jobs:
           path: |
             build/version_num.txt
 
-#      - name: Upload run_id artifact
-#        if: ${{ success() }}
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: run_id-${{ env.BRANCH_NAME }}.txt
-#          retention-days: 90
-#          path: |
-#            build/run_id-${{ env.BRANCH_NAME }}.txt
-
       # Use this to help debug issues
       - name: Dump context
         # See Settings -> Secrets to turn this step on and off
