@@ -24,16 +24,16 @@ jobs:
       PHASE_ID: b
 
     steps:
-#      - name: Set branch name from github reference
-#        run: |
-#          BRANCH_NAME=`basename ${{ github.ref }}`
-#          if [[ ${BRANCH_NAME} == *'release_v'* ]]; then
-#            echo "BRANCH_NAME: ${BRANCH_NAME}"
-#            echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
-#          else 
-#            echo "ERROR - Must use a release branch!"
-#            exit 1
-#          fi
+      - name: Check branch name in github reference
+        run: |
+          BRANCH_NAME=`basename ${{ github.ref }}`
+          if [[ ${BRANCH_NAME} == *'release_v'* ]]; then
+            echo "BRANCH_NAME: ${BRANCH_NAME}"
+            #echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
+          else 
+            echo "ERROR - Must use a release branch!"
+            exit 1
+          fi
 
       - name: Checkout code
         uses: actions/checkout@v2
