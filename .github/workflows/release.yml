@@ -42,8 +42,8 @@ jobs:
         working-directory: build
         run: |
           echo "Repo Owner:" ${{ github.repository_owner }}
-          #echo "Run ID:" ${{ github.run_id }}
-          #echo ${{ github.run_id }} > run_id-${{ env.BRANCH_NAME }}.txt
+          echo "Run ID:" ${{ github.run_id }}
+          echo ${{ github.run_id }} > run_id-${{ env.BRANCH_NAME }}.txt
 
           export VER_NUM=`cat version.txt` 
           echo "${VER_NUM}${{ env.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
@@ -69,6 +69,14 @@ jobs:
           retention-days: 90
           path: |
             build/version_num.txt
+
+      - name: Upload run_id artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: run_id-${{ env.BRANCH_NAME }}.txt
+          retention-days: 90
+          path: |
 
       # Use this to help debug issues
       - name: Dump context
