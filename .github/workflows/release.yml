@@ -77,6 +77,7 @@ jobs:
           name: run_id-${{ env.BRANCH_NAME }}.txt
           retention-days: 90
           path: |
+            build/run_id-${{ env.BRANCH_NAME }}.txt
 
       # Use this to help debug issues
       - name: Dump context
