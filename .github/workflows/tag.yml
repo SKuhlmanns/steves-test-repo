@@ -76,7 +76,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-${{ env.LIB_TAG_NAME }}-txt
+          name: version-txt
           retention-days: 90
           path: |
             build/version.txt
@@ -85,7 +85,7 @@ jobs:
         if: ${{ success() }}
         uses: actions/upload-artifact@v2
         with:
-          name: version-num-${{ env.LIB_TAG_NAME }}-txt
+          name: version-num-txt
           retention-days: 90
           path: |
             build/version_num.txt
