@@ -5,7 +5,6 @@ on:
     tags:
       - LIB_*     # Push events matching refs/heads/LIB_* tags
       - NOVOS_*   # Push events matching refs/heads/NOVOS_* tags
-#  workflow_dispatch:
 
 env:
   DISPLAY_CONTEXT: ${{ secrets.DISPLAY_CONTEXT }}    # To display github context for debugging
@@ -48,13 +47,9 @@ jobs:
           echo
           echo "$STEPS_CONTEXT"
 
-      - name: Set tag name from github reference
+      - name: Set tag name
         run: |
           LIB_TAG_NAME=`basename ${{ github.ref }}`
-          #if [[ $LIB_TAG_NAME == 'LIB'* ]]; then
-          #  VERSION=`echo $LIB_TAG_NAME | cut -d"_" -f2`
-          #  LIB_TAG_NAME="LIB_${VERSION}"
-          #fi
           echo "LIB_TAG_NAME: ${LIB_TAG_NAME}"
           echo "LIB_TAG_NAME=${LIB_TAG_NAME}" >> $GITHUB_ENV
 
@@ -62,8 +57,6 @@ jobs:
         working-directory: build
         run: |
           echo "Repo Owner:" ${{ github.repository_owner }}
-          echo "Run ID:" ${{ github.run_id }}
-          echo ${{ github.run_id }} > run_id-${{ env.LIB_TAG_NAME }}.txt
 
           export VER_NUM=`cat version.txt` 
           echo "${VER_NUM}${{ env.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
@@ -80,6 +73,7 @@ jobs:
           retention-days: 90
           path: |
             build/version.txt
+#            build/version_num.txt
 
       - name: Upload version_num.txt artifact
         if: ${{ success() }}
@@ -89,12 +83,3 @@ jobs:
           retention-days: 90
           path: |
             build/version_num.txt
-
-      - name: Upload run_id artifact
-        if: ${{ success() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: run_id-${{ env.LIB_TAG_NAME }}.txt
-          retention-days: 90
-          path: |
-            build/run_id-${{ env.LIB_TAG_NAME }}.txt
