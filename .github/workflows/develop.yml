@@ -1,17 +1,10 @@
 name: Build develop branch
-#name: Build develop and release branches
 
 on: 
   push:
     branches:
       # Push events on develop branch
       - develop
-      # Push events on release branches
-      #- 'release_v*'
-      #- 'release/release_v*'
-      # Push events on feature branches
-      #- 'feature/**'
-      #- '*feature*'
   workflow_dispatch:    # May only be needed to rebuild project when needed
     branches:           # It has no parent projects
       - develop
@@ -27,10 +20,9 @@ jobs:
     env:
       BUILD_NUMBER: ${{ github.run_number }}
       PHASE_ID: x
-      #CHILD_YAML: push.yml
 
     steps:
-      - name: Set branch name from github reference
+      - name: Check and set branch name
         run: |
           BRANCH_NAME=`basename ${{ github.ref }}`
           if [[ ${BRANCH_NAME} == develop ]]; then
@@ -44,81 +36,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      #- name: Setup build environment for release branches
-      #  if: contains(github.ref,'release')
-      #  run: |
-      #    echo "PHASE ID: ${PHASE_ID}"
-      #    echo "BUILD NUMBER: ${BUILD_NUMBER}"
-      #    echo "Setting PHASE ID to b"
-      #    echo "PHASE_ID=b" >> $GITHUB_ENV
-      #    echo "CHILD_YAML=release.yml" >> $GITHUB_ENV
-
-      #- name: Setup build environment for feature branches
-      #  if: contains(github.ref,'feature')
-      #  run: |
-      #    echo "PHASE ID: ${PHASE_ID}"
-      #    echo "BUILD NUMBER: ${BUILD_NUMBER}"
-      #    echo "Setting PHASE ID to f"
-      #    echo "PHASE_ID=f" >> $GITHUB_ENV
-      #    echo "CHILD_YAML=feature.yml" >> $GITHUB_ENV
-
-      - name: Build the application
-        working-directory: build
-        run: |
-          echo "Repo Owner:" ${{ github.repository_owner }}
-          echo "Run ID:" ${{ github.run_id }}
-          echo ${{ github.run_id }} > run_id-${{ env.BRANCH_NAME }}.txt
-
-          export VER_NUM=`cat version.txt` 
-          echo "${VER_NUM}${{ env.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
-          PHASE_ID=${{ env.PHASE_ID }}
-          echo "PHASE ID: ${PHASE_ID}"
-          cat version_num.txt
-          bash bbuild.sh .. 
-
-      - name: Upload version.txt artifact
-        if: ${{ success() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: version-txt
-          retention-days: 30
-          path: |
-            build/version.txt
-
-      - name: Upload version_num.txt artifact
-        if: ${{ success() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: version-num-txt
-          retention-days: 30
-          path: |
-            build/version_num.txt
-
-      - name: Upload run_id artifact
-        if: ${{ success() }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: run_id-${{ env.BRANCH_NAME }}.txt
-          retention-days: 30
-          path: |
-            build/run_id-${{ env.BRANCH_NAME }}.txt
-
-      # Does not find any artifacts
-      #- name: Generate list of run artifacts
-      #  run: |
-      #    curl \
-      #    -sL https://api.github.com/repos/SKuhlmanns/steves-test-repo/actions/runs/${{ github.run_id }}/artifacts \
-      #    -o artifact-${{ env.BRANCH_NAME }}-list.txt
-      #    cat artifact-${{ env.BRANCH_NAME }}-list.txt
-
-      #- name: Upload run artifact list text file
-      #  if: ${{ success() }}
-      #  uses: actions/upload-artifact@v2
-      #  with:
-      #    name: artifact-${{ env.BRANCH_NAME }}-list.txt
-      #    path: |
-      #      artifact-${{ env.BRANCH_NAME }}-list.txt
- 
       # Use this to help debug issues
       - name: Dump context
         # See Settings -> Secrets to turn this step on and off
@@ -140,13 +57,36 @@ jobs:
           echo
           echo "$STEPS_CONTEXT"
 
-      # Trigger the downstream project(s)/repos
-      #- name: Trigger - steves-test-repo2 event
-      #  run: |
-      #    curl -X POST https://api.github.com/repos/SKuhlmanns/steves-test-repo2/actions/workflows/${{ env.CHILD_YAML }}/dispatches \
-      #    -H 'Accept: application/vnd.github.v3+json' \
-      #    -u ${{ secrets.KUHLMANNS_CURL_TOKEN }} \
-      #    -d '{"ref":"${{ github.ref }}"}'
+      - name: Build the application
+        working-directory: build
+        run: |
+          echo "Repo Owner:" ${{ github.repository_owner }}
+
+          export VER_NUM=`cat version.txt` 
+          echo "${VER_NUM}${{ env.PHASE_ID }}-${BUILD_NUMBER}" > version_num.txt
+          PHASE_ID=${{ env.PHASE_ID }}
+          echo "PHASE ID: ${PHASE_ID}"
+          cat version_num.txt
+          bash bbuild.sh .. 
+
+      - name: Upload version.txt artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: version-txt
+          retention-days: 30
+          path: |
+            build/version.txt
+#            build/version_num.txt
+
+      - name: Upload version_num.txt artifact
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: version-num-txt
+          retention-days: 30
+          path: |
+            build/version_num.txt
 
   # Trigger the downstream project(s)/repos
   linux-triggers:
