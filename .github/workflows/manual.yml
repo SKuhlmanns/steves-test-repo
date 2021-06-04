@@ -16,22 +16,35 @@ jobs:
       PHASE_ID: x
 
     steps:
-      - name: Check branch name in github reference
+      - name: Check branch name
         run: |
-          BRANCH_NAME=`echo ${{ github.ref }} | cut -d"/" -f3- | tr "/" "-"`
-          if [[ ${BRANCH_NAME} == 'release'* ]]; then
+          BRANCH_NAME=`echo ${{ github.ref }} | cut -d"/" -f3-`
+          if [[ ${BRANCH_NAME} == 'release'* ]] || [[ ${BRANCH_NAME} == develop ]]; then
             echo "Error - Do not use a develop or release branch!"
             exit 1
-          elif [[ ${BRANCH_NAME} == develop ]]; then
-            echo "Error - Do not use a develop or release branch!"
-            exit 1
-          else
-            echo "BRANCH_NAME: ${BRANCH_NAME}"
-            echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
           fi
       
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Dump context
+        if: ${{ env.DISPLAY_CONTEXT == 'true' }}
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+          JOB_CONTEXT: ${{ toJSON(job) }}
+          STEPS_CONTEXT: ${{ toJSON(steps) }}
+        run: |
+          echo "GITHUB CONTEXT:"
+          echo
+          echo "$GITHUB_CONTEXT"
+          echo
+          echo "JOB CONTEXT:"
+          echo
+          echo "$JOB_CONTEXT"
+          echo
+          echo "STEPS CONTEXT:"
+          echo
+          echo "$STEPS_CONTEXT"
 
       - name: Build the application
         working-directory: build
@@ -53,6 +66,7 @@ jobs:
           retention-days: 14
           path: |
             build/version.txt
+#            build/version_num.txt
 
       - name: Upload version_num.txt artifact
         if: ${{ success() }}
@@ -62,22 +76,3 @@ jobs:
           retention-days: 14
           path: |
             build/version_num.txt
-
-      - name: Dump context
-        if: ${{ env.DISPLAY_CONTEXT == 'true' }}
-        env:
-          GITHUB_CONTEXT: ${{ toJSON(github) }}
-          JOB_CONTEXT: ${{ toJSON(job) }}
-          STEPS_CONTEXT: ${{ toJSON(steps) }}
-        run: |
-          echo "GITHUB CONTEXT:"
-          echo
-          echo "$GITHUB_CONTEXT"
-          echo
-          echo "JOB CONTEXT:"
-          echo
-          echo "$JOB_CONTEXT"
-          echo
-          echo "STEPS CONTEXT:"
-          echo
-          echo "$STEPS_CONTEXT"
